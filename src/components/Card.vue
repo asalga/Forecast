@@ -1,30 +1,40 @@
 <template>
   <div class="card rounded-lg text-center border-gray-300 mx-auto">
-    <h1 class="day">{{ formatDate(data.dt_txt) }}</h1>
+    <h1 class="day">
+      {{ getDayName(data.dt_txt) }} {{ formatDate(data.dt_txt) }}
+    </h1>
     <h1>{{ data.weather[0].main }}</h1>
     <img :src="getIcon(data.weather[0].icon)" class="mx-auto" />
-    <div>{{ data.main.feels_like }}°C</div>
+    <div>{{ formatTemp(data.main.temp) }}°C</div>
   </div>
 </template>
 
 <script>
 import formatDate from "@/js/formatDate";
+// https://openweathermap.org/weather-conditions#Weather-Condition-Codes-2
+const getIcon = (iconCode) =>
+  `http://openweathermap.org/img/wn/${iconCode}@2x.png`;
+
+const formatTemp = (temp) => Math.round(temp);
+
+// expected format is: "2022-03-30 06:00:00"
+const getDayName = (str) => {
+  const DayNames = ["Sun", "Mon", "Tue", "Wed", "Thur", "Fri", "Sat"];
+  return DayNames[new Date(str).getDay()];
+};
 
 export default {
   name: "WeatherCard",
   methods: {
     getIcon,
     formatDate,
+    formatTemp,
+    getDayName,
   },
   props: {
     data: Object,
   },
 };
-
-// https://openweathermap.org/weather-conditions#Weather-Condition-Codes-2
-function getIcon(iconCode) {
-  return `http://openweathermap.org/img/wn/${iconCode}@2x.png`;
-}
 </script>
 
 <style scoped lang="scss">

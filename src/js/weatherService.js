@@ -1,6 +1,6 @@
 module.exports = {
 
-    getDataByLatLong(lat, long) {
+    getDataByCityName(city) {
         let api = 'b35827e52f2e77d232dfbb7634a24a99';
 
         // 5 days * 8 samplers per day = 40
@@ -11,7 +11,6 @@ module.exports = {
             const xhr = new XMLHttpRequest();
 
             xhr.onload = () => {
-                console.log("XHR ON LOAD");
                 res(JSON.parse(xhr.responseText).list);
             };
 
@@ -22,9 +21,8 @@ module.exports = {
 
             const path = [
                 `http://api.openweathermap.org/data/2.5/forecast?`,
-                `units=metric`,
-                `&lat=${lat}`,
-                `&lon=${long}`,
+                `q=${city}`,
+                `&units=metric`,
                 `&cnt=${cnt}`,
                 `&appid=${api}`
             ].join('');

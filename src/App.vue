@@ -1,7 +1,48 @@
 <template>
   <div class="max-w-3xl mx-auto">
     <h1 class="text-3xl font-bold underline text-center">Toronto Forecast</h1>
-    <!-- <input /> -->
+
+    <form
+      v-on:submit.prevent="onSubmit"
+      class="bg-white rounded px-8 pt-6 pb-8 mb-4"
+    >
+      <div class="mb-4">
+        <input
+          ref="city"
+          class="
+            shadow
+            appearance-none
+            border
+            rounded
+            py-2
+            px-3
+            text-gray-700
+            leading-tight
+            focus:outline-none focus:shadow-outline
+          "
+          id="city"
+          type="text"
+          value="Toronto"
+          placeholder="Toronto"
+        />
+        <button
+          class="
+            bg-blue-500
+            hover:bg-blue-700
+            text-white
+            font-bold
+            py-2
+            px-4
+            rounded
+            focus:outline-none focus:shadow-outline
+          "
+          type="button"
+          @click="updateData"
+        >
+          Go
+        </button>
+      </div>
+    </form>
 
     <div class="container">
       <ul
@@ -16,9 +57,7 @@
           md:w-full
         "
       >
-        <!-- <ul class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-5"> -->
         <li v-for="item in weatherData" :key="item">
-          <!-- <Card v-for="d in data" :key="d.test" :data="data"> </Card> -->
           <Card :data="item"></Card>
         </li>
       </ul>
@@ -36,11 +75,20 @@ export default {
     Card,
   },
   mounted() {
-    weatherService.getDataByLatLong(0, 0).then((res) => {
-      // Each day has 8 measurements ( every 3 hours in 24 hour day)
-      // so let's just get the first measurement for each day
-      this.weatherData = res.filter((day, idx) => idx % 8 === 0);
-    });
+    this.updateData();
+  },
+  methods: {
+    onSubmit() {
+      this.updateData();
+    },
+
+    updateData() {
+      weatherService.getDataByCityName(this.$refs.city.value).then((res) => {
+        // Each day has 8 measurements ( every 3 hours in 24 hour day)
+        // so let's just get the first measurement for each day
+        this.weatherData = res.filter((day, idx) => idx % 8 === 0);
+      });
+    },
   },
   data() {
     return {
@@ -68,5 +116,3 @@ h1 {
   margin-top: 40px;
 }
 </style>
-
-
