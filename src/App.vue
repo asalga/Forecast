@@ -4,7 +4,7 @@
       {{ formatCityName(cityHeader) }} Forecast
     </h1>
 
-    <temperature-unit ref="test"></temperature-unit>
+    <temperature-unit ref="temperatureUnit"></temperature-unit>
 
     <form
       v-on:submit.prevent="onSubmit"
@@ -65,7 +65,7 @@
         <li v-for="item in weatherData" :key="item">
           <WeatherCard
             :tempData="item"
-            :unit="this.$refs.test.getUnit()"
+            :unit="this.$refs.temperatureUnit.getUnit()"
           ></WeatherCard>
         </li>
       </ul>
@@ -113,7 +113,6 @@ export default {
   },
   data() {
     return {
-      unit: "C",
       defaultCity: DefaultCity,
       currCity: DefaultCity,
       cityHeader: DefaultCity,
