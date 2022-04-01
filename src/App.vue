@@ -1,6 +1,10 @@
 <template>
   <div class="max-w-3xl mx-auto">
-    <h1 class="text-3xl font-bold underline text-center">Toronto Forecast</h1>
+    <h1 class="text-3xl font-bold underline text-center">
+      {{ formatCityName(cityHeader) }} Forecast
+    </h1>
+
+    <temperature-unit ref="test"></temperature-unit>
 
     <form
       v-on:submit.prevent="onSubmit"
@@ -22,8 +26,9 @@
           "
           id="city"
           type="text"
-          value="Toronto"
-          placeholder="Toronto"
+          v-model="currCity"
+          :placeholder="defaultCity"
+          v-bind:class="{ error: !isValid }"
         />
         <button
           class="
@@ -58,7 +63,10 @@
         "
       >
         <li v-for="item in weatherData" :key="item">
-          <Card :data="item"></Card>
+          <WeatherCard
+            :tempData="item"
+            :unit="this.$refs.test.getUnit()"
+          ></WeatherCard>
         </li>
       </ul>
     </div>
@@ -66,32 +74,50 @@
 </template>
 
 <script>
-import Card from "./components/Card.vue";
+import WeatherCard from "@/components/WeatherCard.vue";
 import weatherService from "./js/weatherService";
+import TemperatureUnit from "@/components/TemperatureUnit.vue";
+
+const DefaultCity = "Toronto";
 
 export default {
   name: "App",
   components: {
-    Card,
+    WeatherCard,
+    TemperatureUnit,
   },
   mounted() {
     this.updateData();
   },
   methods: {
+    formatCityName(cityName) {
+      return cityName[0].toUpperCase() + cityName.substring(1);
+    },
     onSubmit() {
       this.updateData();
     },
-
     updateData() {
-      weatherService.getDataByCityName(this.$refs.city.value).then((res) => {
-        // Each day has 8 measurements ( every 3 hours in 24 hour day)
-        // so let's just get the first measurement for each day
-        this.weatherData = res.filter((day, idx) => idx % 8 === 0);
-      });
+      weatherService
+        .getDataByCityName(this.$refs.city.value)
+        .then((res) => {
+          // Each day has 8 measurements ( every 3 hours in 24 hour day)
+          // so let's just get the first measurement for each day
+          this.weatherData = res.filter((day, idx) => idx % 8 === 0);
+          this.currCity = this.cityHeader = this.$refs.city.value;
+          this.isValid = true;
+        })
+        .catch(() => {
+          this.isValid = false;
+        });
     },
   },
   data() {
     return {
+      unit: "C",
+      defaultCity: DefaultCity,
+      currCity: DefaultCity,
+      cityHeader: DefaultCity,
+      isValid: true,
       weatherData: [],
     };
   },
@@ -105,6 +131,10 @@ html {
 
 h1 {
   color: black;
+}
+
+.error {
+  border: 1px solid red;
 }
 
 #app {

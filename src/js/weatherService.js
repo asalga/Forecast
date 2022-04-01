@@ -27,7 +27,14 @@ module.exports = {
                 `&appid=${api}`
             ].join('');
 
-            xhr.open("GET", path);
+            xhr.open("GET", path, true);
+
+            xhr.onloadend = () => {
+                if (xhr.status === 404) {
+                    throw new Error('404 - ', path);
+                }
+            }
+
             xhr.send();
         });
 
