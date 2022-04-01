@@ -1,7 +1,53 @@
 <template>
   <div class="max-w-3xl mx-auto">
-    <h1 class="text-3xl font-bold underline text-center">Toronto Forecast</h1>
-    <!-- <input /> -->
+    <h1 class="text-3xl font-bold underline text-center">
+      {{ formatCityName(cityHeader) }} Forecast
+    </h1>
+
+    <temperature-unit ref="test"></temperature-unit>
+
+    <form
+      v-on:submit.prevent="onSubmit"
+      class="bg-white rounded px-8 pt-6 pb-8 mb-4"
+    >
+      <div class="mb-4">
+        <input
+          ref="city"
+          class="
+            shadow
+            appearance-none
+            border
+            rounded
+            py-2
+            px-3
+            text-gray-700
+            leading-tight
+            focus:outline-none focus:shadow-outline
+          "
+          id="city"
+          type="text"
+          v-model="currCity"
+          :placeholder="defaultCity"
+          v-bind:class="{ error: !isValid }"
+        />
+        <button
+          class="
+            bg-blue-500
+            hover:bg-blue-700
+            text-white
+            font-bold
+            py-2
+            px-4
+            rounded
+            focus:outline-none focus:shadow-outline
+          "
+          type="button"
+          @click="updateData"
+        >
+          Go
+        </button>
+      </div>
+    </form>
 
     <div class="container">
       <ul
@@ -16,10 +62,11 @@
           md:w-full
         "
       >
-        <!-- <ul class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-5"> -->
         <li v-for="item in weatherData" :key="item">
-          <!-- <Card v-for="d in data" :key="d.test" :data="data"> </Card> -->
-          <Card :data="item"></Card>
+          <WeatherCard
+            :tempData="item"
+            :unit="this.$refs.test.getUnit()"
+          ></WeatherCard>
         </li>
       </ul>
     </div>
@@ -27,23 +74,50 @@
 </template>
 
 <script>
-import Card from "./components/Card.vue";
+import WeatherCard from "@/components/WeatherCard.vue";
 import weatherService from "./js/weatherService";
+import TemperatureUnit from "@/components/TemperatureUnit.vue";
+
+const DefaultCity = "Toronto";
 
 export default {
   name: "App",
   components: {
-    Card,
+    WeatherCard,
+    TemperatureUnit,
   },
   mounted() {
-    weatherService.getDataByLatLong(0, 0).then((res) => {
-      // Each day has 8 measurements ( every 3 hours in 24 hour day)
-      // so let's just get the first measurement for each day
-      this.weatherData = res.filter((day, idx) => idx % 8 === 0);
-    });
+    this.updateData();
+  },
+  methods: {
+    formatCityName(cityName) {
+      return cityName[0].toUpperCase() + cityName.substring(1);
+    },
+    onSubmit() {
+      this.updateData();
+    },
+    updateData() {
+      weatherService
+        .getDataByCityName(this.$refs.city.value)
+        .then((res) => {
+          // Each day has 8 measurements ( every 3 hours in 24 hour day)
+          // so let's just get the first measurement for each day
+          this.weatherData = res.filter((day, idx) => idx % 8 === 0);
+          this.currCity = this.cityHeader = this.$refs.city.value;
+          this.isValid = true;
+        })
+        .catch(() => {
+          this.isValid = false;
+        });
+    },
   },
   data() {
     return {
+      unit: "C",
+      defaultCity: DefaultCity,
+      currCity: DefaultCity,
+      cityHeader: DefaultCity,
+      isValid: true,
       weatherData: [],
     };
   },
@@ -59,6 +133,10 @@ h1 {
   color: black;
 }
 
+.error {
+  border: 1px solid red;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -68,5 +146,3 @@ h1 {
   margin-top: 40px;
 }
 </style>
-
-

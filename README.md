@@ -24,5 +24,6 @@ npm run lint
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
 ### TODO
- - add input field
- - add C/F conversion
+ - don't re-query weather end point if data has not changed
+ - add height to image so card sizes don't 'jump'
+ - add some fun colors
