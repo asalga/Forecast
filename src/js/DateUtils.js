@@ -33,8 +33,7 @@ const DateUtils = {
       "Dec",
     ];
 
-    return `${months[monthIdx]} ${day}`;
-
+    return `${DateUtils.getDayName(str)} ${months[monthIdx]} ${day}`;
   }
 }
 
