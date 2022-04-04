@@ -45,8 +45,8 @@ export default {
   methods: {
     updateView() {
       this.feelsLike = this.toUserPrefTemp(this.tempData.main.feels_like);
-      this.tempMin = this.toUserPrefTemp(this.tempData.main.temp_min);
-      this.tempMax = this.toUserPrefTemp(this.tempData.main.temp_max);
+      this.tempMin = this.toUserPrefTemp(this.tempData.main.daily_min);
+      this.tempMax = this.toUserPrefTemp(this.tempData.main.daily_max);
     },
 
     // icon codes: openweathermap.org/weather-conditions#Weather-Condition-Codes-2
