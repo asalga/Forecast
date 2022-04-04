@@ -74,9 +74,11 @@
 </template>
 
 <script>
+import _ from "lodash";
+
 import WeatherCard from "@/components/WeatherCard.vue";
-import weatherService from "./js/weatherService";
 import TemperatureUnit from "@/components/TemperatureUnit.vue";
+import weatherService from "./js/weatherService";
 
 const DefaultCity = "Toronto";
 
@@ -86,23 +88,53 @@ export default {
     WeatherCard,
     TemperatureUnit,
   },
+
   mounted() {
     this.updateData();
   },
+
   methods: {
+    // quebec => Quebec
     formatCityName(cityName) {
       return cityName[0].toUpperCase() + cityName.substring(1);
     },
+
+    /*
+      Each day has 8 samples with min and max temperatures which 
+      correspond to that particular sample, so we need to iterate over
+      all the samples for each day and find the min and max / high and low
+    */
+    decorateDailyMinMaxTemps(res) {
+      // Group data by date
+      let groupedByDate = _.groupBy(res, (d) => d.dt_txt.split(" ")[0]);
+      let groupedArr = Object.values(groupedByDate);
+      let minMaxTemps = groupedArr.map((g) => {
+        let dailyMin = _.min(g.map((d) => d.main.temp_min));
+        let dailyMax = _.max(g.map((d) => d.main.temp_max));
+        return { dailyMin, dailyMax };
+      });
+
+      // Each day has 8 measurements (every 3 hours in 24 hour day)
+      // so let's just get the first measurement for each day
+      let weatherData = res.filter((day, idx) => idx % 8 === 0);
+
+      weatherData.forEach((day, idx) => {
+        day.main.daily_min = minMaxTemps[idx].dailyMin;
+        day.main.daily_max = minMaxTemps[idx].dailyMax;
+      });
+
+      return weatherData;
+    },
+
     onSubmit() {
       this.updateData();
     },
+
     updateData() {
       weatherService
         .getDataByCityName(this.$refs.city.value)
         .then((res) => {
-          // Each day has 8 measurements ( every 3 hours in 24 hour day)
-          // so let's just get the first measurement for each day
-          this.weatherData = res.filter((day, idx) => idx % 8 === 0);
+          this.weatherData = this.decorateDailyMinMaxTemps(res);
           this.currCity = this.cityHeader = this.$refs.city.value;
           this.isValid = true;
         })
@@ -111,6 +143,7 @@ export default {
         });
     },
   },
+
   data() {
     return {
       defaultCity: DefaultCity,
