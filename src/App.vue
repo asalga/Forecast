@@ -1,7 +1,7 @@
 <template>
   <div class="max-w-3xl mx-auto">
     <h1 class="text-3xl font-bold underline text-center">
-      {{ formatCityName(cityHeader) }} Forecast
+      {{ formatCityName(cityHeader) }}, {{ this.country }} Forecast
     </h1>
 
     <temperature-unit ref="temperatureUnit"></temperature-unit>
@@ -134,7 +134,8 @@ export default {
       weatherService
         .getDataByCityName(this.$refs.city.value)
         .then((res) => {
-          this.weatherData = this.decorateDailyMinMaxTemps(res);
+          this.country = res.city.country;
+          this.weatherData = this.decorateDailyMinMaxTemps(res.list);
           this.currCity = this.cityHeader = this.$refs.city.value;
           this.isValid = true;
         })

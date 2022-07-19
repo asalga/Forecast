@@ -24,7 +24,7 @@ npm run lint
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
 ### TODO
- - fix min/max temperature
  - don't re-query weather end point if data has not changed
  - add some fun colors
  - look into websocket error
+ - create module for header

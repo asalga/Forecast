@@ -11,7 +11,7 @@ module.exports = {
             const xhr = new XMLHttpRequest();
 
             xhr.onload = () => {
-                res(JSON.parse(xhr.responseText).list);
+                res(JSON.parse(xhr.responseText));
             };
 
             xhr.onerror = () => {

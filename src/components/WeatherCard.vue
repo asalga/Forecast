@@ -10,6 +10,10 @@
       feels like: {{ this.feelsLike }}°{{ this.tempUnit }}
     </h2>
 
+    <h2 class="humidity">
+      humidity: {{ this.humidity }}
+    </h2>
+
     <img :src="this.getIcon(tempData.weather[0].icon)" class="icon mx-auto" />
 
     <div class="min-max">
@@ -40,6 +44,7 @@ export default {
       feelsLike: 0,
       tempMin: 0,
       tempMax: 0,
+      humidity: 0
     };
   },
   methods: {
@@ -47,6 +52,7 @@ export default {
       this.feelsLike = this.toUserPrefTemp(this.tempData.main.feels_like);
       this.tempMin = this.toUserPrefTemp(this.tempData.main.daily_min);
       this.tempMax = this.toUserPrefTemp(this.tempData.main.daily_max);
+      this.humidity = this.tempData.main.humidity;
     },
 
     // icon codes: openweathermap.org/weather-conditions#Weather-Condition-Codes-2
